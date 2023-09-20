@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue';
 
 interface Data {
+  id: number,
   name: string,
   class: string,
 }
@@ -11,37 +12,41 @@ const classRef = ref<string>('')
 const studentsRef = ref<Data[]>([])
 
 
-const getStudent = () => {
-  studentsRef.value = JSON.parse(localStorage.getItem("student") ?? "[]")
+const getStudent = async () => {
+  const dataRes = await fetch("http://localhost:5173/api");
+
+  const data = await dataRes.json();
+  studentsRef.value = data;
 }
 
-
-const saveStudent = () => {
+const postStudent = async () => {
   const nameVal: string = nameRef.value
   const classVal: string = classRef.value
+  nameRef.value = ""
+  classRef.value = ""
 
-  const data: Data = {
+  const data = {
     name: nameVal,
     class: classVal
   }
-  const strStudents = localStorage.getItem("student");
 
-  const students: Data[] = JSON.parse(strStudents ?? "[]")
-
-  students.push(data)
-  localStorage.setItem("student", JSON.stringify(students))
-
-  nameRef.value = ""
-  classRef.value = ""
+  await fetch("http://localhost:5173/api", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
 
   getStudent()
 }
 
-const deleteStudent = (idx: number) => {
-  const newStudents: Data[] = studentsRef.value
-  newStudents.splice(idx, 1)
-  studentsRef.value = newStudents
-  localStorage.setItem("student", JSON.stringify(studentsRef.value))
+const deleteStudent = async (idx: number) => {
+  await fetch("http://localhost:5173/api", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({id: idx})
+  });
+
+  getStudent()
 }
 
 onMounted(() => {
@@ -67,7 +72,7 @@ onMounted(() => {
         </div>
 
         <div class="flex justify-end">
-          <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white p-2 px-4 rounded" @click="saveStudent">
+          <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white p-2 px-4 rounded" @click="postStudent">
             Lưu
           </button>
         </div>
@@ -79,10 +84,18 @@ onMounted(() => {
       <table class="w-full border-collapse border border-black ">
         <thead>
           <tr class="sticky top-0">
-            <th class="w-1/6"><div class="border border-solid border-black">ID</div></th>
-            <th class="w-2/6"><div class="border border-solid border-black">Họ tên</div></th>
-            <th class="w-2/6"><div class="border border-solid border-black">Lớp</div></th>
-            <th class="w-1/6"><div class="border border-solid border-black">Xóa</div></th>
+            <th class="w-1/6">
+              <div class="border border-solid border-black">ID</div>
+            </th>
+            <th class="w-2/6">
+              <div class="border border-solid border-black">Họ tên</div>
+            </th>
+            <th class="w-2/6">
+              <div class="border border-solid border-black">Lớp</div>
+            </th>
+            <th class="w-1/6">
+              <div class="border border-solid border-black">Xóa</div>
+            </th>
           </tr>
         </thead>
 
@@ -91,7 +104,7 @@ onMounted(() => {
             <td class="border-r border-black px-2">{{ index + 1 }}</td>
             <td class="border-r border-black px-2">{{ student.name }}</td>
             <td class="border-r border-black px-2">{{ student.class }}</td>
-            <td class="text-center px-2"><button @click="deleteStudent(index)"
+            <td class="text-center px-2"><button @click="deleteStudent(student.id)"
                 class="bg-red-600 hover:bg-red-700 text-white p-1 rounded">Delete</button></td>
           </tr>
         </tbody>
@@ -100,6 +113,4 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
