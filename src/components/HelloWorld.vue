@@ -48,11 +48,10 @@ onMounted(() => {
   getStudent()
 })
 
-
 </script>
 
 <template>
-  <div class="container mx-auto">
+  <div class="container mx-auto flex flex-col h-[100vh]">
     <div class="formContainer">
       <h1 class="text-2xl font-semibold mb-5">Quản lý học sinh</h1>
 
@@ -76,14 +75,14 @@ onMounted(() => {
     </div>
 
 
-    <div class="tableContainer overflow-scroll">
+    <div class="tableContainer overflow-scroll my-3">
       <table class="w-full border-collapse border border-black ">
         <thead>
-          <tr>
-            <th class="w-1/6 border border-black">ID</th>
-            <th class="w-2/6 border border-black">Họ tên</th>
-            <th class="w-2/6 border border-black">Lớp</th>
-            <th class="w-2/6 border border-black"></th>
+          <tr class="sticky top-0">
+            <th class="w-1/6"><div class="border border-solid border-black">ID</div></th>
+            <th class="w-2/6"><div class="border border-solid border-black">Họ tên</div></th>
+            <th class="w-2/6"><div class="border border-solid border-black">Lớp</div></th>
+            <th class="w-1/6"><div class="border border-solid border-black">Xóa</div></th>
           </tr>
         </thead>
 
@@ -102,11 +101,5 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.formContainer {
-  height: 40vh;
-}
 
-.tableContainer {
-  height: 60vh;
-}
 </style>
